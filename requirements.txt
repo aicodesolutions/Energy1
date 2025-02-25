@@ -1,0 +1,10 @@
+streamlit
+Django==5.1
+django-bootstrap5
+django-allauth
+djangorestframework
+djangorestframework-simplejwt
+python-dateutil
+django-environ==0.11.2
+aixplain
+

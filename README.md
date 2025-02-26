@@ -1,12 +1,15 @@
-on the folder run
+Down load the code to your folder
+On folder run
 python -m venv venv
 venv\scripts\activate
 pip install --upgrade pip
 #python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 
-**For Streamlit**
+**For Data Check**
+python 01DataCheck.py
 
+**For Streamlit**
 streamlit run mainpage.py
 
 **For Django**

@@ -28,7 +28,7 @@ def create_additional_data(df1, tempdate):
     return df
 
 # Read the input CSV file containing hourly consumption data
-df = pd.read_csv('ConsumptionHourly.csv')
+df = pd.read_csv('template.csv')
 # Get the first 24 records (1 day) from the DataFrame
 df = df.head(24)
 

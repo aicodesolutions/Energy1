@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 #df = pd.read_csv("ConsumptionHourly.csv")  
-df = pd.read_csv("ConsumptionHourly1.csv")  
+df = pd.read_csv("final_filled_data.csv") 
+
 
 
 df = df.set_index("Datetime")

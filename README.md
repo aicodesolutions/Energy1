@@ -9,6 +9,7 @@ pip install -r requirements.txt
 **For Data Check**
 python 01DataCheck.py
 
+python 02Predict1.py
 **For Streamlit**
 streamlit run mainpage.py
 

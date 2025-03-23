@@ -1,36 +1,36 @@
-
-# This script is used to generate hourly consumption data for 30 days by adding random values to the existing data.
-# The script reads the initial data from a CSV file, creates a template data for one day, and then adds random values to the template data to create additional data for the next 30 days.   
-# The final data is written to a new CSV file.It removes the template data from the final data.
+# This script is used for generating hourly consumption data for 30 days by adding random values to the existing data.
+# The script reads the initial data from a CSV file, creates a template data for one day, and then adds random values to the template data to create additional data for the next 30 days.
+# The final data is written to a new CSV file. It removes the template data from the final data.
 # The script assumes that the input CSV file contains hourly consumption data for one day (24 records) and that the data is in the following format:
-# it only proces two columns Datetime and Consumption. Any other corlumns will be duplicated in the final data.
+# It only processes two columns: Datetime and Consumption. Any other columns will be duplicated in the final data.
 
-#  Import necessary libraries
+# Import necessary libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-# ...existing code...
-
 # Function to create consumption data for 24 hours
 def create_template_data(tempdate, season='Winter'):
     df = pd.DataFrame()  # Create an empty DataFrame
     df['Datetime'] = pd.date_range(start=tempdate, periods=24, freq='H')  # Generate a range of 24 hourly timestamps
+    
     if season == 'Winter':
-        # Define consumption values for each hour
-        df['Consumption'] = [1, 1, 1, 1, 1.2, 1.4, 1.4, 1.5, 1.2,1.2, 1.2, 1.2, 1.2, 1.3, 1.3, 1.5, 1.5, 1.4, 1.4, 1.4, 1.2, 1.2, 1, 1]
-    if season == 'Summer':
-        # Define consumption values for each hour
-        df['Consumption'] = [1.2, 1.2, 1.2, 1.2, 1.4, 1.6, 1.6, 1.7, 1.4,1.4, 1.4, 1.4, 1.4, 1.5, 1.5, 1.7, 1.7, 1.6, 1.6, 1.6, 1.4, 1.4, 1.2, 1.2]
+        # Define consumption values for each hour in Winter
+        df['Consumption'] = [1, 1, 1, 1, 1.2, 1.4, 1.4, 1.5, 1.2, 1.2, 1.2, 1.2, 1.2, 1.3, 1.3, 1.5, 1.5, 1.4, 1.4, 1.4, 1.2, 1.2, 1, 1]
+    elif season == 'Summer':
+        # Define consumption values for each hour in Summer
+        df['Consumption'] = [1.2, 1.2, 1.2, 1.2, 1.4, 1.6, 1.6, 1.7, 1.4, 1.4, 1.4, 1.4, 1.4, 1.5, 1.5, 1.7, 1.7, 1.6, 1.6, 1.6, 1.4, 1.4, 1.2, 1.2]
+    
     return df
 
 # Function to create additional data by adding random values to the consumption data
 def create_additional_data(df1, tempdate):
     df = pd.DataFrame()  # Create an empty DataFrame
     df['Datetime'] = pd.date_range(start=tempdate, periods=24, freq='H')  # Generate a range of 24 hourly timestamps
-    # Add random values between -1.1 and 1.1 to the existing consumption data
-    df['Consumption'] = df1['Consumption'] + (0.01 * (random.randrange(1,10)-5))
+    # Add random values between -0.05 and 0.05 to the existing consumption data
+    df['Consumption'] = df1['Consumption'] + (0.01 * (random.randrange(1, 10) - 5))
+    
     return df
 
 # Read the input CSV file containing hourly consumption data
@@ -40,11 +40,15 @@ df = df.head(24)
 
 # Function to generate data for a given month
 def generate_monthly_data(start_date, days_in_month, season):
-    df1 = create_template_data(start_date, season)
-    df=df1
+    df1 = create_template_data(start_date, season)  # Create template data for the first day
+    df = df1  # Initialize the DataFrame with the template data
+    
     for i in range(1, days_in_month):
+        # Generate the date for the next day
         tempdate = start_date.split('/')[0] + '/' + str(i + 1) + '/' + start_date.split('/')[2]
+        # Create additional data for the next day
         df1 = create_additional_data(df1, tempdate)
+        # Concatenate the new data with the existing data
         df = pd.concat([df, df1])
     
     return df
@@ -71,6 +75,7 @@ df = df.sort_values(by='Datetime')
 # Reset the index of the DataFrame
 df = df.reset_index(drop=True)
 
+# Plot the energy consumption over time
 plt.figure(figsize=(10, 6))
 df['Consumption'].plot(title='Energy Consumption Over Time')
 plt.show()
@@ -78,4 +83,3 @@ plt.show()
 # Write the final data to a new CSV file
 df.to_csv('Hourlydata1.csv', index=False)
 print('Data written to file')
-#-----

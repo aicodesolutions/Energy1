@@ -1,69 +1,76 @@
+
+import requests
+import time
+
+#import os
+#os.environ["TEAM_API_KEY"] = "7b49158bfdd4208b296a6710ce770e00cb79a7b6a23013cefafa90632ff3e16f"
+#AIXPLAIN_API_KEY = os.getenv("TEAM_API_KEY")
+
+AIXPLAIN_API_KEY = "127ac171414ce790d81e4f9da29069f2d249caf226b95af7024aafa9b54a306c"
+AGENT_ID = "67dec11e338999cb9696a19a"
+POST_URL = f"https://platform-api.aixplain.com/sdk/agents/{AGENT_ID}/run"
+
+headers = {
+	"x-api-key": AIXPLAIN_API_KEY,
+	"Content-Type": 'application/json'
+}
+
+data = {
+	"query": "<QUERY_TEXT_DATA>",
+	# "sessionId": "<SESSIONID_TEXT_DATA>",  # Optional: Specify sessionId from the previous message
+}
+
+# POST request to execute the agent
+response = requests.post(POST_URL, headers=headers, json=data)
+response_data = response.json()
+request_id = response_data.get("requestId")
+
+get_url = f"https://platform-api.aixplain.com/sdk/agents/{request_id}/result"
+
+# Polling loop: GET request until the result is completed
+while True:
+	get_response = requests.get(get_url, headers=headers)
+	result = get_response.json()
+	
+	if result.get("completed"):
+		print(result)
+		break
+	else:
+			time.sleep(5) # Wait for 5 seconds before checking the result again
+
+
 import streamlit as st
+import os
 
-if "role" not in st.session_state:
-    st.session_state.role = None
+st.write("""
+# My first app
+Hello *world!*
+""")
 
-ROLES = [None, "John Miller", "Jennifer Johnson"]
+from aixplain.factories import AgentFactory
+os.environ["TEAM_API_KEY"] = "7b49158bfdd4208b296a6710ce770e00cb79a7b6a23013cefafa90632ff3e16f"
+os.environ["AIXPLAIN_API_KEY"]= "7b49158bfdd4208b296a6710ce770e00cb79a7b6a23013cefafa90632ff3e16f"
+AIXPLAIN_API_KEY = os.getenv("TEAM_API_KEY")
+TEAM_API_KEY = os.getenv("TEAM_API_KEY")
 
+def AIXPL_chat (messages):
+    agent_id= '67deb299181c58b7238eb57c'
+    agent_id='67dec11e338999cb9696a19a'
+    agent = AgentFactory.get(agent_id)
+    agent_response1 = agent.run(messages)
+    return agent_response1["data"]["output"]
 
-def login():
+user_input = st.chat_input("Type your message...")
 
-    st.header("Log in")
-    role = st.selectbox("Choose User Profile", ROLES)
+if user_input:
+    # Display user message
+    st.chat_message("user").markdown(user_input)
+    st.session_state.messages.append(user_input)
 
-    if st.button("Log in"):
-        st.session_state.role = role
-        st.rerun()
-
-
-def logout():
-    st.session_state.role = None
-    st.rerun()
-
-
-role = st.session_state.role
-
-logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
-#settings = st.Page("settings.py", title="Settings", icon=":material/settings:")
-request_1 = st.Page(
-    "user1/dashboard1.py",
-    title="Dashboard",
-    icon=":material/help:",
-    default=(role == "John Miller"),
-)
-request_2 = st.Page(
-    "user1/user1chat.py", title="Chat", icon=":material/bug_report:"
-)
-respond_1 = st.Page(
-    "user2/dashboard2.py",
-    title="Dashboard",
-    icon=":material/healing:",
-    default=(role == "Jennifer Johnson"),
-)
-respond_2 = st.Page(
-    "user2/user2chat.py", title="Respond 2", icon=":material/handyman:"
-)
-
-
-account_pages = [logout_page]
-request_pages = [request_1, request_2]
-respond_pages = [respond_1, respond_2]
-
-
-st.title("Intelligent Energy")
-st.logo("images/horizontal_blue.png", icon_image="images/icon_blue.png")
-
-page_dict = {}
-if st.session_state.role in ["John Miller", "Admin"]:
-    page_dict["John Miller"] = request_pages
-if st.session_state.role in ["Jennifer Johnson", "Admin"]:
-    page_dict["Jennifer Johnson"] = respond_pages
-if st.session_state.role == "Admin":
-    page_dict["Admin"] = admin_pages
-
-if len(page_dict) > 0:
-    pg = st.navigation( page_dict | {"Account": account_pages})
-else:
-    pg = st.navigation([st.Page(login)])
-
-pg.run()
+    # Get response from AIXPL
+    with st.spinner("Thinking..."):
+        assistant_reply = AIXPL_chat(st.session_state.messages)
+    
+    # Display assistant message
+    st.chat_message("assistant").markdown(assistant_reply)
+    st.session_state.messages.append(assistant_reply)

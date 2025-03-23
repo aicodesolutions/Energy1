@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-#os.environ["TEAM_API_KEY"] = "d5f9ceab4735c08039a826856aa9a5647c47d9031c870f91a54c4557d1851209"
 os.environ["TEAM_API_KEY"] = "7b49158bfdd4208b296a6710ce770e00cb79a7b6a23013cefafa90632ff3e16f"
 AIXPLAIN_API_KEY = os.getenv("TEAM_API_KEY")
 # Create model tools
@@ -24,7 +23,7 @@ asr_tool = ModelTool(
     function=Function.SPEECH_RECOGNITION,
 )
 #Create index
-consumption_data1 = [
+consumption_data2 = [
     {"id": "doc1", "Energy Consumption hour": "12:00AM-1:00AM", "Energy Consumption": "1.5kWh"},
     {"id": "doc2", "Energy Consumption hour": "1:00AM-2:00AM", "Energy Consumption": "2.0kWh"},
     {"id": "doc3", "Energy Consumption hour": "2:00AM-3:00AM", "Energy Consumption": "1.8kWh"},
@@ -53,12 +52,12 @@ consumption_data1 = [
 
 
 from aixplain.factories import IndexFactory
-index = IndexFactory.create(name="Energy Consumption 1", description="Index for Estimated energy Consumption")
+index = IndexFactory.create(name="Energy Consumption 4", description="Index for Estimated energy Consumption")
 from aixplain.modules.model.record import Record
 
 records = [
     Record(value=item["Energy Consumption"], value_type="text", id=item["Energy Consumption hour"])
-    for item in consumption_data1
+    for item in consumption_data2
 ]
 
 index.upsert(records)
@@ -72,32 +71,22 @@ from aixplain.factories import AgentFactory
 
 search_tool = ModelTool(
     model=index.id,
-    description="This tool searches inside an index on hourly energy consumptin and respond to questions "
+    description="This tool searches inside an index on hourly energy consumption and respond to questions "
 )
 
 agent = AgentFactory.create(
-    name="Energy-AI-Agetn-ver-02",
+    name="Energy-AI-Agent-ver-04",
     tools=[
         speech_synthesis_tool,
         asr_tool,
         translation_tool,
         search_tool
     ],
-    description="This is an Energy AI agent ",
-    # required llm_id
-    llm_id="6646261c6eb563165658bbb1" # GPT 4o
+    description="This is an Energy AI agent which helps an Indian rural consumer to conserve energy. The user may only have lights,tv and fridge as appliances. The peak energy consumption in their area is between 7 to 9PM",
+ 
+    llm_id="6646261c6eb563165658bbb1" # This is the code to get GPT 4o
 )
-agent.id
-#agent id '67deb299181c58b7238eb57c'
-agent = AgentFactory.get(agent.id)
-agent.__dict__
+print(agent.id)
 
 agent_response1 = agent.run("When is my highest energy consumption?")
-print(agent_response1)
-agent_response1["data"]["output"]
-
-for step in agent_response1["data"]["intermediate_steps"]:
-  print(f'Called agent: {step["agent"]}')
-  for tool_step in step["tool_steps"]:
-    print(f'Tool: {tool_step["tool"]}')
-    print(f'Output: {tool_step["output"]}')
+print(agent_response1["data"]["output"])

@@ -59,3 +59,19 @@ Run the following command:
 ```sh
 python 04deployment.py
 ``````
+
+## Check the agent access
+
+Run the following command:
+
+```sh
+python 05AccessAgent.py
+``````
+
+## Running  the streamlit
+
+Run the following command:
+
+```sh
+streamlit run 06mainpage.py
+``````
